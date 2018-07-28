@@ -36,15 +36,15 @@ app.post('/quote', (req, res) => {
   let HelperOptions = {
     from: `"Premiere Valet Service" <premierevaletservice.la@gmail.com>`,
     to: 'matthew.westenhaver@gmail.com',
-    subject: `Message from ${req.body.name}`,
+    subject: `Quote Request from ${req.body.name}`,
     html: `${req.body.email}` 
   }
 
   let ConfirmationOptions = {
     from: `"Premiere Valet Service" <premierevaletservice.la@gmail.com>`,
     to: req.body.email,
-    subject: `Your Message Was Received`,
-    html: `<b>Subject:</b> ${req.body.name}<br /><br />We will get back to you as soon as possible!<br />The PVS Team`
+    subject: `Your Quote Request Was Received`,
+    html: `Hi ${req.body.name}!<br /><br />Your quote request was received. We will get back to you as soon as possible!<br /><br />- The PVS Team`
   }
   
   transporter.sendMail(HelperOptions, (error, info) => {
@@ -85,15 +85,15 @@ app.post('/work', (req, res) => {
   let HelperOptions = {
     from: `"Premiere Valet Service" <premierevaletservice.la@gmail.com>`,
     to: 'matthew.westenhaver@gmail.com',
-    subject: `Message from ${req.body.firstName}`,
-    html: `<b>SUBJECT:</b> ${req.body.lastName}<br /><br /><b>REPLY TO:</b> ${req.body.email}` 
+    subject: `Job Application from ${req.body.firstName} + ${req.body.lastName}`,
+    html: `<b>Name:</b> ${req.body.lastName} + ${req.body.lastName}<br /><br /><b>REPLY TO:</b> ${req.body.email}` 
   }
 
   let ConfirmationOptions = {
     from: `"Premiere Valet Service" <premierevaletservice.la@gmail.com>`,
     to: req.body.email,
-    subject: `Your Message Was Received`,
-    html: `<b>Subject:</b> ${req.body.firstName}<br /><br />We will get back to you as soon as possible!<br />The PVS Team`
+    subject: `Your Job Application Was Received`,
+    html: `Hi ${req.body.firstName},<br /><br />Your job application was received by our team. We will get back to you as soon as possible!<br /><br />- The PVS Team`
   }
   
   transporter.sendMail(HelperOptions, (error, info) => {
