@@ -16,7 +16,7 @@ app.use(bodyParser.json());
 
 
 app.get('/', (req, res) => {
-  res.json({message:'API root'})
+  res.json({message:'API root', success: 'API successfully loaded'})
 })
 
 app.use('/email', emailRoutes)
