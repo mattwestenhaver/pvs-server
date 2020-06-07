@@ -1,7 +1,6 @@
 const
   dotenv = require('dotenv').load(),
   express = require('express'),
-  nodemailer = require('nodemailer'),
   logger = require('morgan'),
   cors = require('cors'),
   bodyParser = require('body-parser'),
