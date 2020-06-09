@@ -39,8 +39,7 @@ module.exports = {
     
     let mailOptions = {
       from: `"Premiere Valet Services, Inc." <${process.env.USERNAME}>`,
-      // to: 'info@premierevaletparking.com',
-      to: 'matthew.westenhaver@gmail.com',
+      to: 'info@premierevaletparking.com',
       subject: `Quote Request from ${req.body.name}`,
       html: `Below are the details for the quote request:<br /><br /><b>Name:</b> ${req.body.name}<br /><b>Email:</b> ${req.body.email}<br /><b>Phone:</b> ${req.body.phone}<br /><b>Event Address:</b> ${req.body.address}, ${req.body.city} ${req.body.zipcode}<br /><b>Event Date:</b> ${req.body.eventDate}<br /><b>Event Type:</b> ${req.body.eventType}<br /><b>Number of Guests:</b> ${req.body.guests}<br /><b>Number of Cars:</b> ${req.body.cars}<br /><b>Arrival Time:</b> ${req.body.arrival}<br /><b>Departure Time:</b> ${req.body.departure}<br /><b>Parking Conditions & Comments:</b> ${req.body.comments}<br /><b>Referral:</b> ${req.body.reference}<br />` 
     }
