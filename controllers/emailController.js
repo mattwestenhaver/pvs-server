@@ -1,7 +1,8 @@
 const
   nodemailer = require('nodemailer'),
   { google } = require('googleapis'),
-  OAuth2 = google.auth.OAuth2
+  OAuth2 = google.auth.OAuth2,
+  Quote = require('../models/Quote.js')
 ;
 
 const oauth2Client = new OAuth2(
@@ -31,17 +32,22 @@ const smtpTransport = nodemailer.createTransport({
 module.exports = {
 
   quote: (req,res) => {
+
+    Quote.create(req.body, (err, quote) => {
+      if(err) return res.json({ success: false, code: err.code })
+    })
     
     let mailOptions = {
       from: `"Premiere Valet Services, Inc." <${process.env.USERNAME}>`,
-      to: 'info@premierevaletparking.com',
+      // to: 'info@premierevaletparking.com',
+      to: 'matthew.westenhaver@gmail.com',
       subject: `Quote Request from ${req.body.name}`,
       html: `Below are the details for the quote request:<br /><br /><b>Name:</b> ${req.body.name}<br /><b>Email:</b> ${req.body.email}<br /><b>Phone:</b> ${req.body.phone}<br /><b>Event Address:</b> ${req.body.address}, ${req.body.city} ${req.body.zipcode}<br /><b>Event Date:</b> ${req.body.eventDate}<br /><b>Event Type:</b> ${req.body.eventType}<br /><b>Number of Guests:</b> ${req.body.guests}<br /><b>Number of Cars:</b> ${req.body.cars}<br /><b>Arrival Time:</b> ${req.body.arrival}<br /><b>Departure Time:</b> ${req.body.departure}<br /><b>Parking Conditions & Comments:</b> ${req.body.comments}<br /><b>Referral:</b> ${req.body.reference}<br />` 
     }
 
     smtpTransport.sendMail(mailOptions, (error, info) => {
       if(error) {
-        return console.log(error)
+        return console.log(error2)
       }
       console.log(info)
     });
@@ -60,7 +66,7 @@ module.exports = {
       console.log(info2)
     })
   
-    res.json({message:'Comment received.'})
+    res.json({ message:'Quote received.' })
   },
 
   work: (req, res) => {
@@ -93,6 +99,6 @@ module.exports = {
       console.log(info2)
     })
   
-    res.json({message:'Comment received.'})
+    res.json({ message:'Info received.' })
   }
 }
