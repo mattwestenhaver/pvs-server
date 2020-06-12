@@ -6,12 +6,8 @@ const
 
 quoteRouter.get('/', quoteController.index)
 
-quoteRouter.patch('/:id/archive', (req, res) => {
-  quoteRouter.archive
-})
+quoteRouter.patch('/:id/archive', quoteController.archive)
 
-quoteRouter.patch('/:id/activate', (req, res) => {
-  quoteRouter.activate
-})
+quoteRouter.patch('/:id/activate/', quoteController.activate)
 
 module.exports = quoteRouter
