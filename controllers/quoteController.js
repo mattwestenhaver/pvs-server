@@ -15,6 +15,20 @@ module.exports = {
 				quotes
 			})
 		})
+	},
+
+	archive: (req, res) => {
+		Quote.findByIdAndUpdate(req.params.id, { $set: { archived: true } }, (err, archivedQuote) => {
+			if (err) return res.json({ success: false, error: err})
+			res.json({ success: true, message: "Quote Archived", archivedQuote})
+		})
+	},
+
+	activate: (req, res) => {
+		Quote.findByIdAndUpdate(req.params.id, { $set: { archived: false } }, (err, quote) => {
+			if (err) return res.json({ success: false, error: err})
+			res.json({ success: true, message: "Quote Unarchived", quote})
+		})
 	}
 
 }
