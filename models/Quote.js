@@ -16,6 +16,7 @@ const
     departure: { type: String, default: null },
     comments: { type: String, default: null },
     reference: { type: String, default: null },
+    archived: { type: Boolean, default: false }
   })
 ;
 
