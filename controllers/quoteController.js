@@ -25,9 +25,9 @@ module.exports = {
 	},
 
 	activate: (req, res) => {
-		Quote.findByIdAndUpdate(req.params.id, { $set: { archived: false } }, (err, quote) => {
+		Quote.findByIdAndUpdate(req.params.id, { $set: { archived: false } }, (err, activatedQuote) => {
 			if (err) return res.json({ success: false, error: err})
-			res.json({ success: true, message: "Quote Unarchived", quote})
+			res.json({ success: true, message: "Quote Unarchived", activatedQuote})
 		})
 	}
 
