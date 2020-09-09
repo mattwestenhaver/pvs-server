@@ -46,7 +46,7 @@ module.exports = {
 
     smtpTransport.sendMail(mailOptions, (error, info) => {
       if(error) {
-        return console.log(error2)
+        return error
       }
       console.log(info)
     });
@@ -60,7 +60,7 @@ module.exports = {
   
     smtpTransport.sendMail(confirmOptions, (error2, info2) => {
       if(error2) {
-        return console.log(error2)
+        return error2
       }
       console.log(info2)
     })
@@ -79,7 +79,7 @@ module.exports = {
 
     smtpTransport.sendMail(mailOptions, (error, info) => {
       if(error) {
-        return console.log(error)
+        return error
       }
       console.log(info)
     });
@@ -93,7 +93,7 @@ module.exports = {
   
     smtpTransport.sendMail(confirmOptions, (error2, info2) => {
       if(error2) {
-        return console.log(error2)
+        return error2
       }
       console.log(info2)
     })
