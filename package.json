@@ -16,7 +16,7 @@
     "googleapis": "^52.1.0",
     "mongoose": "^5.9.18",
     "morgan": "^1.9.0",
-    "nodemailer": "^4.6.7",
+    "nodemailer": "^6.4.16",
     "nodemon": "^1.18.3"
   }
 }
