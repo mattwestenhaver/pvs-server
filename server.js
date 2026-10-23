@@ -1,28 +1,23 @@
 const
-  dotenv = require('dotenv').load(),
+  dotenv = require('dotenv').config(),
   express = require('express'),
   logger = require('morgan'),
   cors = require('cors'),
-  bodyParser = require('body-parser'),
   app = express(),
   PORT = process.env.PORT || 3001,
   emailRoutes = require('./routes/emailRoutes.js'),
   quoteRoutes = require('./routes/quoteRoutes.js'),
   mongoose = require('mongoose'),
-  MONGODB_URI =  process.env.MONGODB_URI || 'mongodb://localhost/premiere'
+  MONGODB_URI =  process.env.MONGODB_URI || 'mongodb://127.0.0.1/premiere'
 ;
 
-mongoose.connect(MONGODB_URI, {
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  useUnifiedTopology: true
-}, (err) => {
-  console.log(err || `🤘🏾 Connected to Mongo @ ${MONGODB_URI}`)
-});
+mongoose.connect(MONGODB_URI)
+  .then(() => console.log(`🤘🏾 Connected to Mongo @ ${MONGODB_URI}`))
+  .catch((err) => console.log(err));
 
 app.use(cors());
 app.use(logger('dev'));
-app.use(bodyParser.json());
+app.use(express.json());
 
 app.get('/', (req, res) => {
   res.json({message:'API root', success: 'API successfully loaded'})

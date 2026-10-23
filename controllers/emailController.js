@@ -1,21 +1,7 @@
 const
   nodemailer = require('nodemailer'),
-  { google } = require('googleapis'),
-  OAuth2 = google.auth.OAuth2,
   Quote = require('../models/Quote.js')
 ;
-
-const oauth2Client = new OAuth2(
-  process.env.GMAIL_CLIENT_ID, // ClientID
-  process.env.GMAIL_CLIENT_SECRET, // Client Secret
-  "https://developers.google.com/oauthplayground" // Redirect URL
-)
-
-oauth2Client.setCredentials({
-  refresh_token: process.env.GMAIL_REFRESH_TOKEN
-})
-
-const accessToken = oauth2Client.getAccessToken()
 
 const smtpTransport = nodemailer.createTransport({
   service: "gmail",
@@ -24,8 +10,7 @@ const smtpTransport = nodemailer.createTransport({
        user: process.env.USERNAME, 
        clientId: process.env.GMAIL_CLIENT_ID,
        clientSecret: process.env.GMAIL_CLIENT_SECRET,
-       refreshToken: process.env.GMAIL_REFRESH_TOKEN,
-       accessToken: accessToken
+       refreshToken: process.env.GMAIL_REFRESH_TOKEN
   }
 })
 
@@ -33,9 +18,8 @@ module.exports = {
 
   quote: (req,res) => {
 
-    Quote.create(req.body, (err, quote) => {
-      if(err) return res.json({ success: false, code: err.code })
-    })
+    Quote.create(req.body)
+      .catch((err) => console.log(err))
     
     let mailOptions = {
       from: `"Premiere Valet Services, Inc." <${process.env.USERNAME}>`,
