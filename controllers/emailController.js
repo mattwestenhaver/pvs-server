@@ -14,15 +14,111 @@ const smtpTransport = nodemailer.createTransport({
     },
 })
 
+// Form input goes into emails we send, so escape it before it lands in HTML
+const escapeHtml = (value) =>
+    String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+
+const isBlank = (value) =>
+    value === undefined || value === null || String(value).trim() === ''
+
+const joinParts = (parts, separator) =>
+    parts.filter((part) => !isBlank(part)).join(separator)
+
+// Builds the HTML and plain-text versions of an email from intro/outro
+// paragraphs and a list of [label, value] rows. Empty rows are skipped.
+const buildEmail = ({ intro, fields, outro = [] }) => {
+    const rows = fields.filter(([, value]) => !isBlank(value))
+
+    const paragraphs = (lines) =>
+        lines
+            .map(
+                (line) =>
+                    `<p style="white-space: pre-line;">${escapeHtml(line)}</p>`,
+            )
+            .join('')
+
+    const html = `<div style="font-family: Arial, sans-serif; font-size: 14px; color: #222;">
+${paragraphs(intro)}
+<table cellpadding="6" cellspacing="0" style="border-collapse: collapse;">
+${rows
+    .map(
+        ([label, value]) =>
+            `<tr><td style="font-weight: bold; vertical-align: top; white-space: nowrap;">${escapeHtml(label)}</td><td style="white-space: pre-wrap;">${escapeHtml(value)}</td></tr>`,
+    )
+    .join('\n')}
+</table>
+${paragraphs(outro)}
+</div>`
+
+    const text = [
+        intro.join('\n\n'),
+        rows.map(([label, value]) => `${label}: ${value}`).join('\n'),
+        outro.join('\n\n'),
+    ]
+        .filter((section) => section !== '')
+        .join('\n\n')
+
+    return { html, text }
+}
+
+const quoteFields = (body) => [
+    ['Name', body.name],
+    ['Email', body.email],
+    ['Phone', body.phone],
+    [
+        'Event Address',
+        joinParts(
+            [body.address, joinParts([body.city, body.zipcode], ' ')],
+            ', ',
+        ),
+    ],
+    ['Event Date', body.eventDate],
+    ['Event Type', body.eventType],
+    ['Number of Guests', body.guests],
+    ['Number of Cars', body.cars],
+    ['Arrival Time', body.arrival],
+    ['Departure Time', body.departure],
+    ['Parking Conditions & Comments', body.comments],
+    ['Referral', body.reference],
+]
+
+const workFields = (body) => [
+    ['Name', joinParts([body.firstName, body.lastName], ' ')],
+    ['Email', body.email],
+    ['Phone', body.phone],
+    ['Reference', body.reference],
+    ['Education', body.education],
+    ['Skills', body.skills],
+    ['About', body.about],
+    ['Location', body.location],
+    ['Resume', body.resume],
+]
+
+const SIGN_OFF = [
+    'Questions? Just reply to this email.',
+    'Thank you,\nThe Premiere Valet Services, Inc. Team',
+]
+
 module.exports = {
     quote: async (req, res) => {
         Quote.create(req.body).catch((err) => console.log(err))
 
-        let mailOptions = {
+        const fields = quoteFields(req.body)
+
+        const mailOptions = {
             from: FROM,
             to: process.env.QUOTE_EMAIL_TO,
+            replyTo: req.body.email,
             subject: `Quote Request from ${req.body.name}`,
-            html: `Below are the details for the quote request:<br /><br /><b>Name:</b> ${req.body.name}<br /><b>Email:</b> ${req.body.email}<br /><b>Phone:</b> ${req.body.phone}<br /><b>Event Address:</b> ${req.body.address}, ${req.body.city} ${req.body.zipcode}<br /><b>Event Date:</b> ${req.body.eventDate}<br /><b>Event Type:</b> ${req.body.eventType}<br /><b>Number of Guests:</b> ${req.body.guests}<br /><b>Number of Cars:</b> ${req.body.cars}<br /><b>Arrival Time:</b> ${req.body.arrival}<br /><b>Departure Time:</b> ${req.body.departure}<br /><b>Parking Conditions & Comments:</b> ${req.body.comments}<br /><b>Referral:</b> ${req.body.reference}<br />`,
+            ...buildEmail({
+                intro: ['Below are the details for the quote request:'],
+                fields,
+            }),
         }
 
         try {
@@ -36,11 +132,20 @@ module.exports = {
             })
         }
 
-        let confirmOptions = {
+        const confirmOptions = {
             from: FROM,
             to: req.body.email,
-            subject: `Your Quote Request Was Received`,
-            html: `Hi ${req.body.name}!<br /><br />Your quote request was received. We will get back to you as soon as possible!<br /><br />Below are the quote details that you submitted:<br /><br /><b>Name:</b> ${req.body.name}<br /><b>Email:</b> ${req.body.email}<br /><b>Phone:</b> ${req.body.phone}<br /><b>Event Address:</b> ${req.body.address}, ${req.body.city} ${req.body.zipcode}<br /><b>Event Date:</b> ${req.body.eventDate}<br /><b>Event Type:</b> ${req.body.eventType}<br /><b>Number of Guests:</b> ${req.body.guests}<br /><b>Number of Cars:</b> ${req.body.cars}<br /><b>Arrival Time:</b> ${req.body.arrival}<br /><b>Departure Time:</b> ${req.body.departure}<br /><b>Parking Conditions & Comments:</b> ${req.body.comments}<br /><b>Referral:</b> ${req.body.reference}<br /><br />Thank you,<br />The Premiere Valet Services, Inc. Team<br /><br /><b>DO NOT REPLY TO THIS EMAIL ADDRESS. This inbox is not monitored.`,
+            replyTo: process.env.QUOTE_EMAIL_TO,
+            subject: 'Your Quote Request Was Received',
+            ...buildEmail({
+                intro: [
+                    `Hi ${req.body.name}!`,
+                    'Your quote request was received. We will get back to you as soon as possible!',
+                    'Below are the quote details that you submitted:',
+                ],
+                fields,
+                outro: SIGN_OFF,
+            }),
         }
 
         smtpTransport
@@ -51,11 +156,17 @@ module.exports = {
     },
 
     work: async (req, res) => {
-        let mailOptions = {
+        const fields = workFields(req.body)
+
+        const mailOptions = {
             from: FROM,
             to: process.env.JOB_EMAIL_TO,
+            replyTo: req.body.email,
             subject: `Job Application from ${req.body.firstName} ${req.body.lastName}`,
-            html: `Below are the submitted application details:<br /><br /><b>Name:</b> ${req.body.firstName} ${req.body.lastName}<br /><b>Email:</b> ${req.body.email}<br /><b>Phone:</b> ${req.body.phone}<br /><b>Reference:</b> ${req.body.reference}<br /><b>Education:</b> ${req.body.education}<br /><b>Skills:</b> ${req.body.skills}<br /><b>About:</b> ${req.body.about}<br /><b>Location:</b> ${req.body.location}<br /><b>Resume:</b> ${req.body.resume}<br /><br /><b>REPLY TO:</b> ${req.body.email}`,
+            ...buildEmail({
+                intro: ['Below are the submitted application details:'],
+                fields,
+            }),
         }
 
         try {
@@ -69,11 +180,20 @@ module.exports = {
             })
         }
 
-        let confirmOptions = {
+        const confirmOptions = {
             from: FROM,
             to: req.body.email,
-            subject: `Your Job Application Was Received`,
-            html: `Hi ${req.body.firstName},<br /><br />Your job application was received by our team. We will get back to you as soon as possible!<br /><br />Below is a copy of your submitted information for your records:<br /><br /><b>Name:</b> ${req.body.firstName} ${req.body.lastName}<br /><b>Email:</b> ${req.body.email}<br /><b>Phone:</b> ${req.body.phone}<br /><b>Reference:</b> ${req.body.reference}<br /><b>Education:</b> ${req.body.education}<br /><b>Skills:</b> ${req.body.skills}<br /><b>About:</b> ${req.body.about}<br /><b>Location:</b> ${req.body.location}<br /><b>Resume:</b> ${req.body.resume}<br /><br />Thank you,<br />The Premiere Valet Services, Inc. Team<br /><br /><b>DO NOT REPLY TO THIS EMAIL ADDRESS. This inbox is not monitored.`,
+            replyTo: process.env.JOB_EMAIL_TO,
+            subject: 'Your Job Application Was Received',
+            ...buildEmail({
+                intro: [
+                    `Hi ${req.body.firstName},`,
+                    'Your job application was received by our team. We will get back to you as soon as possible!',
+                    'Below is a copy of your submitted information for your records:',
+                ],
+                fields,
+                outro: SIGN_OFF,
+            }),
         }
 
         smtpTransport

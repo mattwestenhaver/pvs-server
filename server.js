@@ -15,6 +15,9 @@ mongoose
     .then(() => console.log(`🤘🏾 Connected to Mongo @ ${MONGODB_URI}`))
     .catch((err) => console.log(err))
 
+// Heroku sits behind a proxy; trust it so rate limiting sees real client IPs
+app.set('trust proxy', 1)
+
 app.use(cors())
 app.use(logger('dev'))
 app.use(express.json())
