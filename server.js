@@ -11,21 +11,21 @@ const mongoose = require('mongoose')
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1/premiere'
 
 mongoose
-  .connect(MONGODB_URI)
-  .then(() => console.log(`🤘🏾 Connected to Mongo @ ${MONGODB_URI}`))
-  .catch((err) => console.log(err))
+    .connect(MONGODB_URI)
+    .then(() => console.log(`🤘🏾 Connected to Mongo @ ${MONGODB_URI}`))
+    .catch((err) => console.log(err))
 
 app.use(cors())
 app.use(logger('dev'))
 app.use(express.json())
 
 app.get('/', (req, res) => {
-  res.json({ message: 'API root', success: 'API successfully loaded' })
+    res.json({ message: 'API root', success: 'API successfully loaded' })
 })
 
 app.use('/email', emailRoutes)
 app.use('/quotes', quoteRoutes)
 
 app.listen(PORT, (err) => {
-  console.log(err || `👏🏾 Server running on ${PORT}`)
+    console.log(err || `👏🏾 Server running on ${PORT}`)
 })

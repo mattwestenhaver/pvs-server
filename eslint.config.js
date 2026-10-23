@@ -3,16 +3,16 @@ const globals = require('globals')
 const prettier = require('eslint-config-prettier')
 
 module.exports = [
-  js.configs.recommended,
-  {
-    files: ['**/*.js'],
-    languageOptions: {
-      sourceType: 'commonjs',
-      globals: globals.node,
+    js.configs.recommended,
+    {
+        files: ['**/*.js'],
+        languageOptions: {
+            sourceType: 'commonjs',
+            globals: globals.node,
+        },
+        rules: {
+            'one-var': ['error', 'never'],
+        },
     },
-    rules: {
-      'one-var': ['error', 'never'],
-    },
-  },
-  prettier,
+    prettier,
 ]
