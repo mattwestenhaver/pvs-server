@@ -1,5 +1,4 @@
 const nodemailer = require('nodemailer')
-const Quote = require('../models/Quote.js')
 
 const FROM =
     '"Premiere Valet Services, Inc." <noreply@premierevaletparking.com>'
@@ -106,8 +105,6 @@ const SIGN_OFF = [
 
 module.exports = {
     quote: async (req, res) => {
-        Quote.create(req.body).catch((err) => console.log(err))
-
         const fields = quoteFields(req.body)
 
         const mailOptions = {

@@ -6,14 +6,6 @@ const cors = require('cors')
 const app = express()
 const PORT = process.env.PORT || 3001
 const emailRoutes = require('./routes/emailRoutes.js')
-const quoteRoutes = require('./routes/quoteRoutes.js')
-const mongoose = require('mongoose')
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1/premiere'
-
-mongoose
-    .connect(MONGODB_URI)
-    .then(() => console.log(`🤘🏾 Connected to Mongo @ ${MONGODB_URI}`))
-    .catch((err) => console.log(err))
 
 // Heroku sits behind a proxy; trust it so rate limiting sees real client IPs
 app.set('trust proxy', 1)
@@ -27,7 +19,6 @@ app.get('/', (req, res) => {
 })
 
 app.use('/email', emailRoutes)
-app.use('/quotes', quoteRoutes)
 
 app.listen(PORT, (err) => {
     console.log(err || `👏🏾 Server running on ${PORT}`)
