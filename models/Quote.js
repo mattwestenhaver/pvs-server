@@ -1,7 +1,6 @@
-const
-  mongoose = require('mongoose')
+const mongoose = require('mongoose')
 
-  quoteSchema = new mongoose.Schema({
+const quoteSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true },
     phone: { type: String, required: true },
@@ -16,9 +15,8 @@ const
     departure: { type: String, default: null },
     comments: { type: String, default: null },
     reference: { type: String, default: null },
-    archived: { type: Boolean, default: false }
-  })
-;
+    archived: { type: Boolean, default: false },
+})
 
 const Quote = mongoose.model('Quote', quoteSchema)
 module.exports = Quote
