@@ -4,11 +4,8 @@ const Quote = require('../models/Quote.js')
 const smtpTransport = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        type: 'OAuth2',
         user: process.env.USERNAME,
-        clientId: process.env.GMAIL_CLIENT_ID,
-        clientSecret: process.env.GMAIL_CLIENT_SECRET,
-        refreshToken: process.env.GMAIL_REFRESH_TOKEN,
+        pass: process.env.PASSWORD,
     },
 })
 
@@ -25,7 +22,7 @@ module.exports = {
 
         smtpTransport.sendMail(mailOptions, (error, info) => {
             if (error) {
-                return error
+                return console.log(error)
             }
             console.log(info)
         })
@@ -39,7 +36,7 @@ module.exports = {
 
         smtpTransport.sendMail(confirmOptions, (error2, info2) => {
             if (error2) {
-                return error2
+                return console.log(error2)
             }
             console.log(info2)
         })
@@ -57,7 +54,7 @@ module.exports = {
 
         smtpTransport.sendMail(mailOptions, (error, info) => {
             if (error) {
-                return error
+                return console.log(error)
             }
             console.log(info)
         })
@@ -71,7 +68,7 @@ module.exports = {
 
         smtpTransport.sendMail(confirmOptions, (error2, info2) => {
             if (error2) {
-                return error2
+                return console.log(error2)
             }
             console.log(info2)
         })
